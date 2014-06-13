@@ -1,11 +1,12 @@
 {
-  "name": "x-form",
-  "version": "0.0.0",
-  "homepage": "https://github.com/dotch/x-form",
+  "name": "x-storage-indexeddb",
+  "version": "0.0.3",
+  "homepage": "https://github.com/dotch/x-storage-indexeddb",
   "authors": [
+    "Matt Claypotch <thepotch@gmail.com>",
     "Christian Weiss <christian.x.weiss@gmail.com>"
   ],
-  "description": "Form component using the Brick Storage API",
+  "description": "Web component indexdb storage",
   "main": "src/element.html",
   "keywords": [
     "brick",
@@ -22,5 +23,6 @@
   "dependencies": {
     "brick-common": "*",
     "platform": "Polymer/platform"
-  }
+  },
+  "devDependencies": {}
 }
