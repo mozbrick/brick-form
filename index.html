@@ -28,9 +28,6 @@
     </select>
     <hr>
 
-    safds
-
-
     <x-storage-indexeddb name="worldcup2014" key="group" id="x-store"></x-storage-indexeddb>
 
     <form is="x-form" id="x-form" storage="x-store" name="a">
@@ -52,7 +49,6 @@
       var xform = document.querySelector("#x-form");
       var groupselect = document.querySelector("#groupselect");
       groupselect.addEventListener("change",function(e){
-        console.log(e);
         xform.name = e.target.value;
       });
     </script>
