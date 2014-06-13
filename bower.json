@@ -1,0 +1,26 @@
+{
+  "name": "x-form",
+  "version": "0.0.0",
+  "homepage": "https://github.com/dotch/x-form",
+  "authors": [
+    "Christian Weiss <christian.x.weiss@gmail.com>"
+  ],
+  "description": "Form component using the Brick Storage API",
+  "main": "src/element.html",
+  "keywords": [
+    "brick",
+    "webcomponents"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "brick-common": "*",
+    "platform": "Polymer/platform"
+  }
+}
