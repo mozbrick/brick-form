@@ -1,10 +1,10 @@
-# x-form
+# brick-form
 
-> A [Brick](https://github.com/mozilla/brick/) form component.
+> A [Brick](https://github.com/mozbrick/brick/) custom element starter-kit.
 
 ## Demo
 
-[Check it live!](http://dotch.github.io/x-form)
+[Check it live!](http://mozbrick.github.io/brick-form)
 
 ## Usage
 
@@ -14,30 +14,25 @@
     <script src="bower_components/platform/platform.js"></script>
     ```
 
-2. Import a Brick-Storage component
-    ```html
-    <link rel="import" href="bower_components/x-storage-indexeddb/src/element.html">
-    ```
-
 2. Import Custom Element:
 
     ```html
-    <link rel="import" href="src/element.html">
+    <link rel="import" href="src/brick-form.html">
     ```
 
 3. Start using it:
 
     ```html
-    <x-store-indexeddb id="store" key="email"></x-store-indexeddb>
-    <x-form store="store" name="example@example.com">... inputs ...</x-form>
+    <brick-storage-indexeddb id="store" key="group"></brick-store-indexeddb>
+    <brick-form store="store" name="a">... inputs ...</brick-form>
     ```
 
 ## Options
 
 Attribute     | Options     | Default      | Description
 ---           | ---         | ---          | ---
-`name`        | *string*    | `x-form`     | The name of the form. Will be used as to identify the forms data in the datastore. Has to be set when using multiple forms.
-`store`       | *string*    |              | The manadtory id of the storage component to save the form data to.
+`name`        | *string*    |              | The name of the form. Will be used  to identify the forms data in the datastore. Has to be set.
+`store`       | *string*    |              | The id of the storage component to save the form data to.
 
 ## Methods
 
@@ -45,12 +40,6 @@ Method            | Parameters   | Returns     | Description
 ---               | ---          | ---         | ---
 `loadFormData()`  |              | data object.| Load the data from the storage component.
 `saveFormData()`  | data object  |             | Save the data from the storage component.
-
-## Events
-
-Event         | Description
----           | ---
-`onsomething` | Triggers when something happens.
 
 ## Development
 
@@ -77,12 +66,8 @@ While developing your component, there is a development server that will watch y
 To run the development server:
 
 * Run `gulp server`
-* Navigate to `http:localhost:3001`
+* Navigate to `http://localhost:3001`
 
 To simply build and lint your code, run `gulp build`.
 
 You can also push your code to GitHub Pages by running `gulp deploy`.
-
-## License
-
-[MIT License](http://opensource.org/licenses/MIT)

@@ -1,12 +1,12 @@
 {
-  "name": "x-form",
+  "name": "brick-form",
   "version": "0.0.0",
-  "homepage": "https://github.com/dotch/x-form",
+  "homepage": "https://github.com/mozbrick/brick-form",
   "authors": [
-    "Christian Weiss <christian.x.weiss@gmail.com>"
+    "mozilla"
   ],
-  "description": "Form component using the Brick Storage API",
-  "main": "src/element.html",
+  "description": "A form component that syncs its content to a brick-storage component.",
+  "main": "src/brick-form.html",
   "keywords": [
     "brick",
     "webcomponents"
@@ -22,5 +22,8 @@
   "dependencies": {
     "brick-common": "*",
     "platform": "Polymer/platform"
+  },
+  "devDependencies": {
+    "brick-storage-indexeddb": "mozbrick/brick-storage-indexeddb"
   }
 }
