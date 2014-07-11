@@ -1,4 +1,4 @@
-(function () {
+(function() {
 
   var KEYVALUE_API_VERSION = 1;
 
@@ -7,18 +7,13 @@
                   window.webkitIndexedDB ||
                   window.msIndexedDB;
 
-  var IDBTransaction = window.IDBTransaction ||
-                       window.webkitIDBTransaction ||
-                       window.mozIDBTransaction ||
-                       window.msIDBTransaction;
-
   var IDBKeyRange = window.IDBKeyRange ||
                     window.webkitIDBKeyRange ||
                     window.msIDBKeyRange;
 
   function wrap(req) {
     return new Promise(function (resolve, reject) {
-      req.onsuccess = function (e) {
+      req.onsuccess = function () {
         resolve(req.result);
       };
       req.onerror = function (e) {
@@ -49,14 +44,14 @@
         reject('No indexedDB implementation found!');
       }
       var req = indexedDB.open(self.storeName, KEYVALUE_API_VERSION);
-      req.onerror = function (e) {
+      req.onerror = function () {
         reject(req.error);
       };
-      req.onsuccess = function (e) {
+      req.onsuccess = function () {
         self.db = req.result;
         resolve(self);
       };
-      req.onupgradeneeded = function (e) {
+      req.onupgradeneeded = function () {
         self.db = req.result;
         var store = self.db.createObjectStore(self.storeName, { keyPath: self.key, autoIncrement: self.autoIncrement });
         // create indices
@@ -76,11 +71,12 @@
 
     // Internal function: returns the objectStore with the supplied
     // transaction mode. Defaults to readonly transaction.
-    _getObjectStore: function(mode) {
+    _getTransactionAndStore: function(mode) {
       var self = this;
       mode = typeof mode !== 'undefined' ? mode : 'readonly';
-      return self.db.transaction(self.storeName, mode)
-                    .objectStore(self.storeName);
+      var tx = self.db.transaction(self.storeName, mode);
+      var store = tx.objectStore(self.storeName);
+      return {'transaction': tx, 'store': store};
     },
 
     // Internal function to defer the execution of a supplied function
@@ -98,7 +94,7 @@
 
     /**
     * Save an object into the database
-    * @param {object} object the object to be saved
+    * @param {object}   object
     * @return {promise} Promise for the id/key to which
     * it was saved
     */
@@ -108,8 +104,12 @@
     },
     _insert: function (object) {
       var self = this;
-      var store = self._getObjectStore('readwrite');
-      return wrap(store.add(object));
+      var db = self._getTransactionAndStore('readwrite');
+      var promise = wrap(db.store.add(object));
+      promise.abort = function(){
+        db.transaction.abort();
+      };
+      return promise;
     },
 
     /**
@@ -125,13 +125,40 @@
     },
     _set: function (object) {
       var self = this;
-      var store = self._getObjectStore('readwrite');
-      return wrap(store.put(object));
+      var db = self._getTransactionAndStore('readwrite');
+      var promise = wrap(db.store.put(object));
+      promise.abort = function(){
+        db.transaction.abort();
+      };
+      return promise;
+    },
+
+    /**
+    * Update or insert multiple objects into the database
+    * @param {objects}  objects
+    * @return {promise}
+    */
+    setMany: function (objects) {
+      var self = this;
+      return self._awaitReady(self._setMany, arguments);
+    },
+    _setMany: function (objects) {
+      var self = this;
+      var db = self._getTransactionAndStore('readwrite');
+      var promises = [];
+      for (var i = 0; i < objects.length; i++) {
+        promises.push(db.store.put(objects[i]));
+      }
+      var promise = Promise.all(promises);
+      promise.abort = function(){
+        db.transaction.abort();
+      };
+      return promise;
     },
 
     /**
      * Get the object saved at a given id/key.
-     * @param  {number|string} id
+     * @param  {number|string} key
      * @return {promise}       Promise for the object
      */
     get: function (key) {
@@ -140,14 +167,18 @@
     },
     _get: function (key) {
       var self = this;
-      var store = self._getObjectStore();
-      return wrap(store.get(key));
+      var db = self._getTransactionAndStore();
+      var promise = wrap(db.store.get(key));
+      promise.abort = function(){
+        db.transaction.abort();
+      };
+      return promise;
     },
 
     /**
      * Removes the the entry with the supplied id/key from the database.
-     * @param  {number|string} id
-     * @return {promise} for undefined
+     * @param  {number|string} key
+     * @return {promise}       Promise for undefined
      */
     remove: function (key) {
       var self = this;
@@ -155,8 +186,12 @@
     },
     _remove: function (key) {
       var self = this;
-      var store = self._getObjectStore('readwrite');
-      return wrap(store.delete(key));
+      var db = self._getTransactionAndStore('readwrite');
+      var promise = wrap(db.store.delete(key));
+      promise.abort = function(){
+        db.transaction.abort();
+      };
+      return promise;
     },
 
     /**
@@ -180,9 +215,8 @@
     _getMany: function(options) {
       options = options || {};
       var self = this;
-      var store = self._getObjectStore();
+      var db = self._getTransactionAndStore();
       var counter = 0;
-      var advanced = false;
       var start = options.start;
       var end = options.end;
       var count = options.count || undefined;
@@ -203,12 +237,12 @@
         bound = null;
       }
       var allItems = [];
-      return new Promise(function(resolve,reject){
+      var promise = new Promise(function(resolve,reject){
         var cursorRequest;
         if (!orderby || orderby === self.key) {
-          cursorRequest = store.openCursor(bound, direction);
+          cursorRequest = db.store.openCursor(bound, direction);
         } else {
-          var index = store.index(orderby);
+          var index = db.store.index(orderby);
           cursorRequest = index.openCursor(bound, direction);
         }
         cursorRequest.onsuccess = function(e){
@@ -232,6 +266,10 @@
           }
         };
       });
+      promise.abort = function(){
+        db.transaction.abort();
+      };
+      return promise;
     },
 
     /**
@@ -244,8 +282,12 @@
     },
     _size: function() {
       var self = this;
-      var store = self._getObjectStore();
-      return wrap(store.count());
+      var db = self._getTransactionAndStore();
+      var promise = wrap(db.store.count());
+      promise.abort = function(){
+        db.transaction.abort();
+      };
+      return promise;
     },
 
     /**
@@ -258,48 +300,15 @@
     },
     _clear: function() {
       var self = this;
-      var store = self._getObjectStore('readwrite');
-      return wrap(store.clear());
+      var db = self._getTransactionAndStore('readwrite');
+      var promise = wrap(db.store.clear());
+      promise.abort = function(){
+        db.transaction.abort();
+      };
+      return promise;
     }
   };
 
-
-var StoragePrototype = Object.create(HTMLElement.prototype);
-
-  StoragePrototype.createdCallback = function () {
-  };
-
-  StoragePrototype.attachedCallback = function () {
-    this.name = this.getAttribute('name') || 'storage';
-    this.key = this.getAttribute('key') || null;
-    this.indices = this.getAttribute('index') ? this.getAttribute('index').split(" ") : [];
-    this.storage = new IndexedDbStore(this.name, this.key, this.indices);
-  };
-
-  StoragePrototype.insert = function (object) {
-    return this.storage.insert(object);
-  };
-  StoragePrototype.set = function (key, object) {
-    return this.storage.set(key, object);
-  };
-  StoragePrototype.get = function (key) {
-    return this.storage.get(key);
-  };
-  StoragePrototype.remove = function (key) {
-    return this.storage.remove(key);
-  };
-  StoragePrototype.getMany = function (options) {
-    return this.storage.getMany(options);
-  };
-  StoragePrototype.size = function () {
-    return this.storage.size();
-  };
-  StoragePrototype.clear = function () {
-    return this.storage.clear();
-  };
-
-  window.XStorageIndexedDB = document.registerElement('x-storage-indexeddb', {
-    prototype: StoragePrototype
-  });
+  window.IndexedDbStore = IndexedDbStore;
 
 })();
