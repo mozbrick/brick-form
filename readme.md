@@ -1,6 +1,6 @@
 # brick-form
 
-> A [Brick](https://github.com/mozbrick/brick/) custom element starter-kit.
+> A [Brick](https://github.com/mozbrick/brick/) form component which uses a brick-storage component to store its content.
 
 ## Demo
 
