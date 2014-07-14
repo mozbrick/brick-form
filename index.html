@@ -17,7 +17,7 @@
   </head>
   <body>
 
-    <brick-storage-indexeddb name="tournament" key="group" id="store">
+    <brick-storage-indexeddb name="worldcup" keyname="group" id="store">
     </brick-storage-indexeddb>
 
     <select id="groupselect">
@@ -61,8 +61,9 @@
         Points: <input type="text" name="team4_points">
       </label>
       <br>
-      <button type="submit">update</button>
+      <input type="submit" value="update">
     </brick-form>
+
 
     <script>
       var form = document.querySelector("brick-form");
