@@ -41,7 +41,7 @@
   };
 
   var attrs = {
-    'name': function (oldVal, newVal) {
+    'name': function () {
       this.loadFormData();
     }
   };
@@ -50,7 +50,6 @@
   BrickFormElementPrototype.loadFormData = function () {
     var self = this;
     self.storage.get(self.name).then(function(data){
-      console.info("x-form:loaded formdata", self.name, data);
       for (var i = 0; i < self.elements.length; i++) {
         var element = self.elements[i];
         var val = data ? data[element.name] || "" : "";
@@ -76,9 +75,7 @@
       }
       data[key] = value;
     }
-    return self.storage.set(data).then(function(name){
-      console.info("x-form:saved formdata", name, data);
-    });
+    return self.storage.set(data);
   };
 
   // Property handlers
@@ -105,10 +102,7 @@
     },
     'storage': {
       get: function () {
-        if (!this._storage) {
-          this._storage = document.getElementById(this.getAttribute("storage"));
-        }
-        return this._storage;
+        return document.getElementById(this.getAttribute("storage"));
       }
     },
     'elements': {
