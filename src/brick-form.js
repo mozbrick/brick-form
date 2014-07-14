@@ -110,9 +110,9 @@
         return this.form.elements;
       }
     },
-    'key': {
+    'keyname': {
       get: function() {
-        return this.storage.getAttribute("key");
+        return this.storage.getAttribute("keyname");
       }
     }
   });
