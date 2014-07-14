@@ -26,7 +26,6 @@
   }
 
   function IndexedDbStore(storeName, key, indices) {
-
     var self = this;
     self._ready = false;
     self.storeName = storeName;
