@@ -48,16 +48,13 @@
     self.storage.get(self.name).then(function(data){
       for (var i = 0; i < self.elements.length; i++) {
         var element = self.elements[i];
-        if (!element.name ||
-            data[element.name] === undefined ||
-            data[element.name] === null) {
-          return;
-        }
-        var val = data[element.name];
-        if (element.type === "checkbox") {
-          element.checked = !!val;
-        } else {
-          element.value = val;
+        if (element.name) {
+          var val = data ? data[element.name] || "" : "";
+          if (element.type === "checkbox") {
+            element.checked = !!val;
+          } else {
+            element.value = val;
+          }
         }
       }
     });
