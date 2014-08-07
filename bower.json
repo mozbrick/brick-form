@@ -6,7 +6,7 @@
     "mozilla"
   ],
   "description": "A form component that syncs its content to a brick-storage component.",
-  "main": "src/brick-form.html",
+  "main": "dist/brick-form.html",
   "keywords": [
     "brick",
     "webcomponents"
@@ -20,8 +20,8 @@
     "tests"
   ],
   "dependencies": {
-    "brick-common": "*",
-    "platform": "Polymer/platform"
+    "platform": "Polymer/platform",
+    "brick-common": "~0.1.4"
   },
   "devDependencies": {
     "brick-storage-indexeddb": "mozbrick/brick-storage-indexeddb"
