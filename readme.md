@@ -23,7 +23,7 @@
 3. Start using it:
 
     ```html
-    <brick-storage-indexeddb id="store" key="group"></brick-store-indexeddb>
+    <brick-storage-indexeddb id="store" key="group"></brick-storage-indexeddb>
     <brick-form storage="store" name="a">... inputs ...</brick-form>
     ```
 
